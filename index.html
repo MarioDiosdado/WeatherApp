@@ -7,10 +7,10 @@
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
         integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
     <link rel="stylesheet" href="style.css">
-    <title>Document</title>
+    <title>Weather</title>
 </head>
 
-<body>
+<body onload="lastItem()">
     <div class="container">
         <div class="card text-center">
             <div class="card-header header">
@@ -41,16 +41,16 @@
             <div class="col-sm-9">
                 <div class="card" id="card1">
                     <div class="card-body">
-                        <h3 class="card-title" id="cityTitle" ></h3>
+                        <h3 class="card-title" id="cityTitle"></h3>
                         <p class="card-text" id="mainTemp"></p>
                         <p class="card-text" id="mainHum"></p>
                         <p class="card-text" id="mainWind"></p>
-                        <p class="card-text">UV Index: <span class="p-2 mb-2 bg-danger text-white" id="mainUv"></span>
+                        <p class="card-text">UV Index: <span class="p-2 mb-2 text-white" id="mainUv"></span>
                         </p>
                     </div>
                 </div>
                 <h3>5-Day Forecast:</h3>
-                <!-- Forecast -->
+                <!-- Forecast Section -->
                 <div class="card-deck">
                     <div class="card text-white bg-primary bla">
                         <div class="card-body">
@@ -108,30 +108,36 @@
         $("#button-addon2").on("click", function () {
             var city = $("#test").val();
             $("#test").val("");
+            //Here we add items to the city list
+            if(citiesArr.indexOf(city) == -1){
             var list = $("<li>").attr("class", "list-group-item").text(city);
             $(".list-group").append(list);
+            }
             var todayDate = moment().format("M/DD/YYYY");
             citiesArr.push(city);
-
-            console.log(citiesArr);
             var APIKey = "175dd204c78ab9c179e7857da85ee994";
             var queryURL = "https://api.openweathermap.org/data/2.5/weather?q=" + city + "&appid=" + APIKey;
+
+            //Local storage
+            var lastSearch = citiesArr[citiesArr.length - 1];
+            localStorage.setItem("city", lastSearch);
+            var cityStored = localStorage.getItem("city");
+            //Here we get the main city info and coordanates for forecast search
             $.ajax({
                 url: queryURL,
                 method: "GET"
             }).then(function (response) {
-
                 var kelvinTemp = response.main.temp;
                 var fahTemp = (kelvinTemp - 273.15) * 1.80 + 32;
                 var tempFixed = fahTemp.toFixed(2) + " °F";
                 var humidity = response.main.humidity + " %";
                 var windSpeed = response.wind.speed + " MPH";
                 var weather = response.weather[0].description;
-                
                 var lat = response.coord.lat;
                 var lon = response.coord.lon;
                 var uv;
                 var queryURLuvi = "http://api.openweathermap.org/data/2.5/uvi?lat=" + lat + "&lon=" + lon + "&appid=" + APIKey;
+                //Here we get the UV information
                 $.ajax({
                     url: queryURLuvi,
                     method: "GET"
@@ -150,7 +156,13 @@
                             var tempFixed3 = fahTemp3.toFixed(2) + " °F";
                             var humidity3 = response3.daily[i].humidity + " %";
                             var weather3 = response3.daily[i].weather[0].main;
-                            $("#mainUv").text(uv);
+                            if (uv <= 2) {
+                                $("#mainUv").addClass("bg-success").text(uv);
+                            } else if (uv >= 3 && uv < 8) {
+                                $("#mainUv").addClass("bg-warning").text(uv);
+                            } else {
+                                $("#mainUv").addClass("bg-danger").text(uv);
+                            }
                             $("#mainTemp").text("Temp: " + tempFixed);
                             $("#mainHum").text("Humidity: " + humidity);
                             $("#mainWind").text("Wind Speed: " + windSpeed);
@@ -166,26 +178,34 @@
                             } else {
                                 $("#img" + i).attr("src", "Assets/sun.png");
                             }
-
                         }
                     });
                 });
-
-
-
-
             });
-
-
-
         })
         // Code so the enter key works on input field
-        $("#test").on("keyup", function(event){
-            if(event.keyCode === 13) {
+        $("#test").on("keyup", function (event) {
+            if (event.keyCode === 13) {
                 event.preventDefault();
                 $("#button-addon2").click();
             }
         })
+        //This prints the last search when page loaded
+        function lastItem() {
+            var cityStored = localStorage.getItem("city");
+            $("#test").val(cityStored);
+            $("#button-addon2").click();
+        }
+
+
+        $(".list-group").on("click", "li", function (event) {
+            var city = $(this).text();
+            //var city = target.text();
+            console.log(city);
+            $("#test").val(city);
+            $("#button-addon2").click();
+        })
+
     </script>
 
 </body>

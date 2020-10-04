@@ -34,18 +34,14 @@
                 </div>
 
                 <div class="card" style="width: auto;">
-                    <ul class="list-group list-group-flush">
-                        <li class="list-group-item">Austin</li>
-                        <li class="list-group-item">Chicago</li>
-                        <li class="list-group-item">New York</li>
-                    </ul>
+                    <ul class="list-group list-group-flush"></ul>
                 </div>
 
             </div>
             <div class="col-sm-9">
                 <div class="card" id="card1">
                     <div class="card-body">
-                        <h3 class="card-title">Austin (10/3/2020)</h3>
+                        <h3 class="card-title" id="cityTitle" ></h3>
                         <p class="card-text" id="mainTemp"></p>
                         <p class="card-text" id="mainHum"></p>
                         <p class="card-text" id="mainWind"></p>
@@ -59,7 +55,7 @@
                     <div class="card text-white bg-primary bla">
                         <div class="card-body">
                             <h6 class="card-title" id="date1"></h6>
-                            <img id="img1" src="Assets/sun.png" alt="sun">
+                            <img id="img1" src="" alt="sun">
                             <p class="card-text" id="temp1"></p>
                             <p class="card-text" id="humid1">Humidity: 41%</p>
                         </div>
@@ -106,32 +102,35 @@
         integrity="sha256-9/aliU8dGd2tb6OSsuzixeV4y/faTqgFtohetphbbj0=" crossorigin="anonymous"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.24.0/moment.min.js"></script>
     <script type="text/javascript">
+        var citiesArr = [];
 
+        //Event listener for when search is clicked
         $("#button-addon2").on("click", function () {
             var city = $("#test").val();
+            $("#test").val("");
+            var list = $("<li>").attr("class", "list-group-item").text(city);
+            $(".list-group").append(list);
+            var todayDate = moment().format("M/DD/YYYY");
+            citiesArr.push(city);
 
+            console.log(citiesArr);
             var APIKey = "175dd204c78ab9c179e7857da85ee994";
-            //var city = "Austin"
             var queryURL = "https://api.openweathermap.org/data/2.5/weather?q=" + city + "&appid=" + APIKey;
-
-
             $.ajax({
                 url: queryURL,
                 method: "GET"
             }).then(function (response) {
-                //console.log(response);
+
                 var kelvinTemp = response.main.temp;
                 var fahTemp = (kelvinTemp - 273.15) * 1.80 + 32;
                 var tempFixed = fahTemp.toFixed(2) + " °F";
                 var humidity = response.main.humidity + " %";
                 var windSpeed = response.wind.speed + " MPH";
                 var weather = response.weather[0].description;
-                //console.log(weather);
+                
                 var lat = response.coord.lat;
                 var lon = response.coord.lon;
                 var uv;
-                //console.log(lat);
-                //console.log(lon);
                 var queryURLuvi = "http://api.openweathermap.org/data/2.5/uvi?lat=" + lat + "&lon=" + lon + "&appid=" + APIKey;
                 $.ajax({
                     url: queryURLuvi,
@@ -143,14 +142,14 @@
                         url: queryURLforecast,
                         method: "GET"
                     }).then(function (response3) {
+                        $("#cityTitle").text(city + " " + todayDate);
+
                         for (i = 1; i < 6; i++) {
-                            //console.log(response3);
                             var kelvinTemp3 = response3.daily[i].temp.day;
                             var fahTemp3 = (kelvinTemp3 - 273.15) * 1.80 + 32;
                             var tempFixed3 = fahTemp3.toFixed(2) + " °F";
                             var humidity3 = response3.daily[i].humidity + " %";
                             var weather3 = response3.daily[i].weather[0].main;
-                            console.log(weather3);
                             $("#mainUv").text(uv);
                             $("#mainTemp").text("Temp: " + tempFixed);
                             $("#mainHum").text("Humidity: " + humidity);
@@ -180,7 +179,13 @@
 
 
         })
-
+        // Code so the enter key works on input field
+        $("#test").on("keyup", function(event){
+            if(event.keyCode === 13) {
+                event.preventDefault();
+                $("#button-addon2").click();
+            }
+        })
     </script>
 
 </body>

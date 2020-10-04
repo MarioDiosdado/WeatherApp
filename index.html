@@ -38,6 +38,7 @@
                 </div>
 
             </div>
+            <!-- Current city Section -->
             <div class="col-sm-9">
                 <div class="card" id="card1">
                     <div class="card-body">
@@ -109,9 +110,9 @@
             var city = $("#test").val();
             $("#test").val("");
             //Here we add items to the city list
-            if(citiesArr.indexOf(city) == -1){
-            var list = $("<li>").attr("class", "list-group-item").text(city);
-            $(".list-group").append(list);
+            if (citiesArr.indexOf(city) == -1) {
+                var list = $("<li>").attr("class", "list-group-item").text(city);
+                $(".list-group").append(list);
             }
             var todayDate = moment().format("M/DD/YYYY");
             citiesArr.push(city);
@@ -132,7 +133,7 @@
                 var tempFixed = fahTemp.toFixed(2) + " °F";
                 var humidity = response.main.humidity + " %";
                 var windSpeed = response.wind.speed + " MPH";
-                var weather = response.weather[0].description;
+                var weather = response.weather[0].main;
                 var lat = response.coord.lat;
                 var lon = response.coord.lon;
                 var uv;
@@ -144,25 +145,39 @@
                 }).then(function (response2) {
                     uv = response2.value;
                     var queryURLforecast = "http://api.openweathermap.org/data/2.5/onecall?lat=" + lat + "&lon=" + lon + "&appid=" + APIKey;
+                    //This changes the color of UV depending on condition
+                    if (uv <= 2) {
+                        $("#mainUv").removeAttr("class");
+                        $("#mainUv").addClass("p-2 mb-2 text-white bg-success").text(uv);
+                    } else if (uv >= 3 && uv < 8) {
+                        $("#mainUv").removeAttr("class");
+                        $("#mainUv").addClass("p-2 mb-2 text-white bg-warning").text(uv);
+                    } else if(uv > 8) {
+                        $("#mainUv").removeAttr("class");
+                        $("#mainUv").addClass("p-2 mb-2 text-white bg-danger").text(uv);
+                    }
                     $.ajax({
                         url: queryURLforecast,
                         method: "GET"
                     }).then(function (response3) {
                         $("#cityTitle").text(city + " " + todayDate);
-
+                        //Here we check the weather to add image to current city
+                        if (weather == "Clear") {
+                            var image = $("<img>").attr("src", "Assets/sun.png");
+                            $("#cityTitle").append(image);
+                        } else if (weather == "Clouds") {
+                            var image = $("<img>").attr("src", "Assets/cloudy.png");
+                            $("#cityTitle").append(image);
+                        } else {
+                            var image = $("<img>").attr("src", "Assets/rainy.png");
+                            $("#cityTitle").append(image);
+                        }
                         for (i = 1; i < 6; i++) {
                             var kelvinTemp3 = response3.daily[i].temp.day;
                             var fahTemp3 = (kelvinTemp3 - 273.15) * 1.80 + 32;
                             var tempFixed3 = fahTemp3.toFixed(2) + " °F";
                             var humidity3 = response3.daily[i].humidity + " %";
                             var weather3 = response3.daily[i].weather[0].main;
-                            if (uv <= 2) {
-                                $("#mainUv").addClass("bg-success").text(uv);
-                            } else if (uv >= 3 && uv < 8) {
-                                $("#mainUv").addClass("bg-warning").text(uv);
-                            } else {
-                                $("#mainUv").addClass("bg-danger").text(uv);
-                            }
                             $("#mainTemp").text("Temp: " + tempFixed);
                             $("#mainHum").text("Humidity: " + humidity);
                             $("#mainWind").text("Wind Speed: " + windSpeed);
@@ -171,12 +186,13 @@
                             $("#date" + i).text(tomorrow);
                             $("#temp" + i).text("Temp: " + tempFixed3);
                             $("#humid" + i).text("Humidity: " + humidity3);
+                            //Here we check the weather to add images to the forecast section
                             if (weather3 == "Clear") {
                                 $("#img" + i).attr("src", "Assets/sun.png");
                             } else if (weather3 == "Clouds") {
                                 $("#img" + i).attr("src", "Assets/cloudy.png");
                             } else {
-                                $("#img" + i).attr("src", "Assets/sun.png");
+                                $("#img" + i).attr("src", "Assets/rainy.png");
                             }
                         }
                     });

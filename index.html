@@ -20,6 +20,7 @@
 
         <div class="row">
             <div class="col-sm-3">
+                <!-- Search input section -->
                 <div class="card">
                     <div class="card-body">
                         <h5 class="card-title">Search for a City</h5>
@@ -32,11 +33,10 @@
                         </div>
                     </div>
                 </div>
-
+                <!-- Search history list section -->
                 <div class="card" style="width: auto;">
                     <ul class="list-group list-group-flush"></ul>
                 </div>
-
             </div>
             <!-- Current city Section -->
             <div class="col-sm-9">
@@ -94,8 +94,6 @@
                         </div>
                     </div>
                 </div>
-
-
             </div>
         </div>
     </div>
@@ -104,12 +102,11 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.24.0/moment.min.js"></script>
     <script type="text/javascript">
         var citiesArr = [];
-
         //Event listener for when search is clicked
         $("#button-addon2").on("click", function () {
             var city = $("#test").val();
             $("#test").val("");
-            //Here we add items to the city list
+            //Here we add items to the city list and prevents from adding a city that's already there
             if (citiesArr.indexOf(city) == -1) {
                 var list = $("<li>").attr("class", "list-group-item").text(city);
                 $(".list-group").append(list);
@@ -152,7 +149,7 @@
                     } else if (uv >= 3 && uv < 8) {
                         $("#mainUv").removeAttr("class");
                         $("#mainUv").addClass("p-2 mb-2 text-white bg-warning").text(uv);
-                    } else if(uv > 8) {
+                    } else if (uv > 8) {
                         $("#mainUv").removeAttr("class");
                         $("#mainUv").addClass("p-2 mb-2 text-white bg-danger").text(uv);
                     }
@@ -172,6 +169,7 @@
                             var image = $("<img>").attr("src", "Assets/rainy.png");
                             $("#cityTitle").append(image);
                         }
+                        //Here we add the data to the the UI
                         for (i = 1; i < 6; i++) {
                             var kelvinTemp3 = response3.daily[i].temp.day;
                             var fahTemp3 = (kelvinTemp3 - 273.15) * 1.80 + 32;
@@ -179,10 +177,12 @@
                             var humidity3 = response3.daily[i].humidity + " %";
                             var weather3 = response3.daily[i].weather[0].main;
                             $("#mainTemp").text("Temp: " + tempFixed);
+                            //This adds data to current city section
                             $("#mainHum").text("Humidity: " + humidity);
                             $("#mainWind").text("Wind Speed: " + windSpeed);
                             var today = moment();
                             var tomorrow = moment().add(i, "days").format("M/DD/YYYY");
+                            //This adds data to the forecast section
                             $("#date" + i).text(tomorrow);
                             $("#temp" + i).text("Temp: " + tempFixed3);
                             $("#humid" + i).text("Humidity: " + humidity3);
@@ -199,31 +199,27 @@
                 });
             });
         })
-        // Code so the enter key works on input field
+        //Function so the enter key works on input field
         $("#test").on("keyup", function (event) {
             if (event.keyCode === 13) {
                 event.preventDefault();
                 $("#button-addon2").click();
             }
         })
-        //This prints the last search when page loaded
+        //Function that prints the last search when page loaded
         function lastItem() {
             var cityStored = localStorage.getItem("city");
             $("#test").val(cityStored);
             $("#button-addon2").click();
         }
-
-
+        //Function that allow us to search with the search history list
         $(".list-group").on("click", "li", function (event) {
             var city = $(this).text();
-            //var city = target.text();
             console.log(city);
             $("#test").val(city);
             $("#button-addon2").click();
         })
-
     </script>
-
 </body>
 
 </html>

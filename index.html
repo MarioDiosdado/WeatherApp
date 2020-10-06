@@ -134,14 +134,14 @@
                 var lat = response.coord.lat;
                 var lon = response.coord.lon;
                 var uv;
-                var queryURLuvi = "http://api.openweathermap.org/data/2.5/uvi?lat=" + lat + "&lon=" + lon + "&appid=" + APIKey;
+                var queryURLuvi = "https://api.openweathermap.org/data/2.5/uvi?lat=" + lat + "&lon=" + lon + "&appid=" + APIKey;
                 //Here we get the UV information
                 $.ajax({
                     url: queryURLuvi,
                     method: "GET"
                 }).then(function (response2) {
                     uv = response2.value;
-                    var queryURLforecast = "http://api.openweathermap.org/data/2.5/onecall?lat=" + lat + "&lon=" + lon + "&appid=" + APIKey;
+                    var queryURLforecast = "https://api.openweathermap.org/data/2.5/onecall?lat=" + lat + "&lon=" + lon + "&appid=" + APIKey;
                     //This changes the color of UV depending on condition
                     if (uv <= 2) {
                         $("#mainUv").removeAttr("class");

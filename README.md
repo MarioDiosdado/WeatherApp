@@ -2,6 +2,8 @@
 
 This application shows the weather of any city selected by the user. It's meant to be used by people who needs to get the weather on the go and plan for the future by giving you a forecast of the next 5 days. 
 
+Here is a link for the app: https://mariodiosdado.github.io/WeatherApp/
+
 ```
 It gets the data from openweather API. It has images that shows the user the current weather condition.
 
